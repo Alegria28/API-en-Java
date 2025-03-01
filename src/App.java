@@ -1,11 +1,9 @@
-
-/*cspell:disable */
+/*cspell:disable*/
 import java.net.*;
 import java.util.Map;
 import java.util.LinkedHashMap;
 import java.util.Scanner;
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 
@@ -82,7 +80,7 @@ public class App {
         botonIP.setFocusPainted(false);
         // Cambiamos la tipografía y el tamaño de esta
         botonIP.setFont(new Font("Tahoma", Font.BOLD, 12));
-        // En caso de que se haga click en este boton, realizamos la función de
+        // En caso de que se haga click en este botón, realizamos la función de
         // obtenerIp
         botonIP.addActionListener(new ActionListener() {
             @Override
@@ -101,7 +99,7 @@ public class App {
         botonClima.setFocusPainted(false);
         // Cambiamos la tipografía y el tamaño de esta
         botonClima.setFont(new Font("Tahoma", Font.BOLD, 12));
-        // En caso de que se haga click en este boton, realizamos la función de
+        // En caso de que se haga click en este botón, realizamos la función de
         // obtenerIp
         botonClima.addActionListener(new ActionListener() {
             @Override
@@ -120,7 +118,7 @@ public class App {
         botonMandarPOST.setFocusPainted(false);
         // Cambiamos la tipografía y el tamaño de esta
         botonMandarPOST.setFont(new Font("Tahoma", Font.BOLD, 12));
-        // En caso de que se haga click en este boton, realizamos la función de
+        // En caso de que se haga click en este botón, realizamos la función de
         // obtenerIp
         botonMandarPOST.addActionListener(new ActionListener() {
             @Override
@@ -159,7 +157,7 @@ public class App {
         mostrarClimaTextField.setHorizontalAlignment(JTextField.CENTER);
 
         // Coordenadas y posición del textField
-        obtenerPOSTTextArea.setBounds(150, 180, 300,130);
+        obtenerPOSTTextArea.setBounds(150, 180, 300, 130);
         // Para que el texto quede ordenado bonito
         obtenerPOSTTextArea.setLineWrap(true);
         obtenerPOSTTextArea.setWrapStyleWord(true);
@@ -332,6 +330,8 @@ public class App {
 
     public static void metodoPost(String mensaje) {
 
+        // Al volver a llamar a este método, siempre limpiamos el TextArea que vamos a
+        // usar
         obtenerPOSTTextArea.setText("");
 
         // Ya que es una acción que puede dar error, lo encerramos en un try-catch
@@ -339,47 +339,58 @@ public class App {
             // Creamos variable URL para la API
             URL url = new URL("https://gogodev.net/ejercicios/testjava.php");
 
-            // Preparamos la información que vamos a enviar
+            // Preparamos la información que vamos a enviar por medio de un Map, que tiene
+            // como parámetro la clave elm y el valor mensaje
             Map<String, Object> parametros = new LinkedHashMap<>();
-
+            // El Post requiere un elm=mensaje
             parametros.put("elm", mensaje);
 
-            // Empezamos a codificar los datos a enviar
+            // Creamos una cadena StringBuilder para construir la cadena de datos
+            // codificados que vamos a enviar
             StringBuilder informacionPost = new StringBuilder();
-
+            // Iteramos sobre las entradas del Map de parámetros
             for (Map.Entry<String, Object> param : parametros.entrySet()) {
 
+                // Si informacionPost no esta vacío, entonces agregamos un & para separar los parámetros
                 if (informacionPost.length() != 0) {
                     informacionPost.append("&");
                 }
 
+                // Codificamos el valor del parametro usando URLEncoder y los agrega a informacionPost
                 informacionPost.append(URLEncoder.encode(param.getKey(), "UTF-8"));
-
                 informacionPost.append("=");
                 informacionPost.append(URLEncoder.encode(String.valueOf(param.getValue()), "UTF-8"));
             }
 
+            // Convertimos la cadena de datos codificados a un arreglo de bytes usando la codificación UTF-8
             byte[] postBytes = informacionPost.toString().getBytes("UTF-8");
 
+            // Configuramos la conexión HTTP
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            // Para enviar una solicitud POST
             connection.setRequestMethod("POST");
+            // Y el tipo de contenido junto con la longitud de este
             connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
             connection.setRequestProperty("Content-Length", String.valueOf(postBytes.length));
+            // Habilitamos la salida
             connection.setDoOutput(true);
+            // Escribimos los bytes de datos en el flujo de salida de la conexión
             connection.getOutputStream().write(postBytes);
 
+            // Leemos la respuesta de la solicitud usando un BufferedReader y un InputStreamReader con codificación UTF-8
             Reader in = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
-
+            // Variable para almacenar la respuesta recibida
             StringBuilder cadenaRecibidaPost = new StringBuilder();
-
             for (int c = in.read(); c != -1; c = in.read()) {
-                cadenaRecibidaPost.append((char)c);
+                // Guardamos la información en nuestra cadena carácter por carácter
+                cadenaRecibidaPost.append((char) c);
             }
 
             // Mostramos lo recibido
             mostrarPOSTTextField.setText(cadenaRecibidaPost.toString());
 
-        } catch (IOException exception) {
+        } catch (Exception exception) {
+            // En caso de que haya ocurrido un error, mostramos el mensaje
             System.out.println(exception.getMessage());
         }
     }
